@@ -1,0 +1,18 @@
+# 1. 忽略 PyCharm / IntelliJ 软件的本地运行缓存（最核心）
+.idea/
+.vscode/
+
+# 2. 忽略 Python 运行时自动生成的编译缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 3. 忽略你未来导出的临时本地股票数据缓存（比如导出的CSV、Excel）
+data_cache/
+*.csv
+*.xlsx
+
+# 4. 忽略系统日志或临时文件
+*.log
+.DS_Store
