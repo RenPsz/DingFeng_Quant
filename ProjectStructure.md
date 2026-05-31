@@ -37,6 +37,22 @@
 设置邮件或微信提醒（可选）
 
 -----------  
+📋 项目规划
+项目定位：金融量化分析系统，包含策略回测 + (核心)市场信号收集 + 前端可视化展示
+等待建设技术栈
+后端：
+1. FastAPI(web框架，写api接口) 
+2. APScheduler(定时任务调度器，让数据自动更新，不用手动跑脚本)
+3. PostgreSQL or SQLite(数据库，避免重复抓取数据)
+4. SQLAlchemy(Python操作数据库的ORM框架)
+前端：
+1. React(目前最主流的前端UI框架，组件化开发)
+2. shadcn/ui(基于Tailwind CSS的组件库，当前前端圈最流行的UI方案)
+3. TradingView Lightweight Charts(专为金融场景设计的图表库)
+4. React Query(管理请求状态和缓存,下发送HTTP请求)
+5. Axios(HTTP请求库，负责前端调用后端API)
+
+----------- 
 
 market_monitor/
 │
@@ -88,3 +104,33 @@ market_monitor/
 ├── requirements.txt          # 依赖包
 ├── README.md                 # 项目说明
 └── .gitignore                # Git忽略文件
+
+前期整体架构
+├── data/           # 数据处理层
+├── strategy/       # 策略层  
+├── backtest/       # 回测分析层
+├── signals/        # 信号分析层（新增）
+├── frontend/       # 前端展示层（新增）
+└── main.py
+
+后期前后端整体架构
+project/
+├── backend/
+│   ├── main.py          # FastAPI 入口
+│   ├── routers/
+│   │   ├── market.py    # 行情接口
+│   │   ├── signals.py   # 信号接口
+│   │   └── backtest.py  # 回测接口
+│   ├── services/        # 你现有的计算逻辑迁移到这里
+│   ├── models/          # 数据库模型
+│   └── scheduler.py     # 定时任务
+│
+└── frontend/
+    ├── src/
+    │   ├── pages/
+    │   │   ├── Dashboard.tsx   # 市场总览
+    │   │   ├── Signals.tsx     # 信号面板
+    │   │   └── Backtest.tsx    # 回测结果
+    │   ├── components/         # 复用组件
+    │   └── api/                # Axios请求封装
+    └── package.json

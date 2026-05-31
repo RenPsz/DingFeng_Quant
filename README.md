@@ -2,13 +2,15 @@
 
 ## 本地git+云端git工作流
 开工:git checkout -b (功能名)
-阶段存盘:git add .git commit -m "规范描述"
+阶段存盘:git add .
+git commit -m "规范描述"
 检查:git status{随时随地输入，看当前改了哪些文件，有没有脏文件收工合流}
 git checkout main   切换到main主线
 git merge (功能名)   {新功能彻底测通了，把它合进主干线备份}
 git push            {同步到 GitHub 存盘}
 
-## git commit 规范
+## git commit 规范  
+
 <type>(<scope>): <subject>
 
 type：本次提交的类型,用来告诉别人，你这次动代码的核心目的是什么。
