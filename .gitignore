@@ -10,9 +10,9 @@ __pycache__/
 *.pyd
 
 # 3. 忽略你未来导出的临时本地股票数据缓存（比如导出的CSV、Excel）
-data_cache/
 *.csv
 *.xlsx
+src/data/cache/
 
 # 4. 忽略系统日志或临时文件
 *.log

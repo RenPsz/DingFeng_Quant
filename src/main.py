@@ -1,5 +1,5 @@
 """主程序：只做流程编排，不写具体计算逻辑"""
-from data import get_index_data
+import data
 from strategy import ma_cross_signal
 from backtest import run_backtest, calculate_metrics, print_report
 from plot import plot_equity_curve
@@ -10,8 +10,11 @@ START_DATE = "2020-01-01"
 FAST, SLOW = 5, 20
 COMMISSION = 0.001
 
+# ---- 0. 更新股指缓存 ----
+data.refresh_indices()
+
 # ---- 1. 取数据 ----
-df = get_index_data(SYMBOL)
+df = data.get_stock_data(SYMBOL)
 
 # ---- 2. 生成信号 ----
 print("正在计算双均线策略信号...")

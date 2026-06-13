@@ -1,6 +1,7 @@
 # 架构设计和展望
 
 ## 当前项目结构(已实现)
+```
 src/
 ├── data.py        # 数据采集
 ├── strategy.py    # 策略信号
@@ -15,10 +16,12 @@ doc/
 .gitignore
 README.md
 requirements.txt
+```
 
 ## 目标结构(前后端分离)
 
 #### 前期整体架构规划
+```
 ├── data/           # 数据处理层
 ├── strategy/       # 策略层  
 ├── backtest/       # 回测分析层
@@ -47,3 +50,4 @@ project/
     │   ├── components/         # 复用组件
     │   └── api/                # Axios请求封装
     └── package.json
+```
