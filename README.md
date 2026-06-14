@@ -17,6 +17,7 @@
 ## 当前进度
 - [x] 双均线策略 + 回测引擎 MVP
 - [x] 项目重构 + 文档完善
+- [x] 本地数据缓存模块
 - [ ] 市场情绪信号采集
 - [ ] 前端可视化
 
@@ -43,19 +44,22 @@ python main.py
 ## 当前项目结构(已实现)
 ```
 src/
-├── data.py        # 数据采集  
-├── strategy.py    # 策略信号  
-├── backtest.py    # 回测计算  
-├── plot.py        # 可视化  
-└── main.py        # 编排入口  
-docs/  
-├── architecture.md         # 架构设计  
-├── roadmap.md              # 开发计划  
-├── domain-notes.md         # 量化知识笔记  
-└── git-workflow.md         # git工作流 && tips  
-assets/  
-└── DFquant_logo.png            # 项目logo  
-.gitignore  
-README.md  
-requirements.txt  
+├── data/
+│   ├── data.py        # 数据采集 + 缓存逻辑
+│   ├── storage.py     # SQLite 存储层
+│   └── cache/         # 本地数据库（已 gitignore）
+├── strategy.py        # 策略信号
+├── backtest.py        # 回测计算
+├── plot.py            # 可视化
+└── main.py            # 编排入口
+docs/
+├── architecture.md         # 架构设计
+├── roadmap.md              # 开发计划
+├── domain-notes.md         # 量化知识笔记
+└── git-workflow.md         # git工作流 && tips
+assets/
+└── DFquant_logo.png
+.gitignore
+README.md
+requirements.txt 
 ```
