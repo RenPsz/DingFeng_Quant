@@ -13,9 +13,7 @@ def _connect() -> sqlite3.Connection:
 
 
 def init_db() -> None:
-    """建表，幂等"""
-    "创建股票，指数日k表"
-    "创建交易日历表"
+    """初始化本地缓存表，重复调用安全。"""
     with _connect() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS daily (

@@ -55,6 +55,15 @@ def sign_flip_alert(factor: pd.Series) -> pd.Series:
     return (prev > 0) & (factor < 0)
 
 
+def lower_tail_alert(factor: pd.Series, lookback: int = 120, q: float = 0.2,
+                     inclusive: bool = False) -> pd.Series:
+    """低分位预警：因子跌破自身滚动分位数。"""
+    threshold = factor.rolling(lookback).quantile(q)
+    if inclusive:
+        return factor <= threshold
+    return factor < threshold
+
+
 def evaluate(alert: pd.Series, target: pd.Series,
              eligible: pd.Series = None) -> dict:
     """评估一组预警信号的命中表现。
@@ -79,6 +88,26 @@ def evaluate(alert: pd.Series, target: pd.Series,
         'n_hits': n_hits,
         'hit_rate': n_hits / n_alerts,
     }
+
+
+def evaluate_traditional_factors(close: pd.Series, factors: pd.DataFrame,
+                                 horizon: int = 60,
+                                 drawdown_threshold: float = -0.15,
+                                 lookback: int = 120) -> pd.DataFrame:
+    """评估当前保留的传统动量因子的中长期风险预警表现。"""
+    fdd = future_drawdown(close, horizon=horizon)
+    target = fdd < drawdown_threshold
+    eligible = fdd.notna()
+
+    alert = lower_tail_alert(factors['momentum'], lookback=lookback)
+    metrics = evaluate(alert.fillna(False), target, eligible)
+    base_rate = float((target & eligible).sum() / eligible.sum()) if eligible.sum() else np.nan
+    metrics['factor'] = 'momentum_low'
+    metrics['base_rate'] = base_rate
+    metrics['lift'] = metrics['hit_rate'] / base_rate if base_rate and not np.isnan(metrics['hit_rate']) else np.nan
+
+    columns = ['factor', 'n_alerts', 'n_hits', 'hit_rate', 'base_rate', 'lift']
+    return pd.DataFrame([metrics])[columns]
 
 
 def bollinger_alert(close: pd.Series, window: int = 20, k: float = 2.0) -> pd.Series:
