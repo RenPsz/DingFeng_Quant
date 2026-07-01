@@ -21,6 +21,7 @@
 - [x] 信号处理因子模块（频域/时域/自相关）+ 有效性验证
 - [x] 传统动量因子验证（`momentum_low` 弱预警增益，保留为候选因子）
 - [x] 市场宽度低位因子验证（60 日均线以上占比低分位未跑赢基准，保留为实验模块）
+- [ ] 在数据层接入更多种类的基础数据，增加市场数据宽度
 - [ ] 多因子融合与预警层（已回滚，待补更多独立因子后再做融合）
 - [ ] 市场情绪信号采集
 - [ ] 前端可视化
@@ -30,7 +31,15 @@
 - 开发计划见 [docs/roadmap.md](docs/roadmap.md)
 - 当前系统定位为多维度市场结构展示 + 中长期风险预警，不做短期涨跌预测。
 
+## 文档
+- [开发记录](docs/changelog.md)
+- [开发计划](docs/roadmap.md)
+- [量化知识笔记](docs/domain-notes.md)
+- [Git 工作流](docs/git-workflow.md)
+
 ## 快速开始
+
+- 项目依赖 Python 3.13.3，建议使用虚拟环境。
 
 1. 克隆项目并安装依赖
 ```bash
@@ -42,40 +51,4 @@ pip install -r requirements.txt
 ```bash
 cd src
 python main.py
-```
-
-## 文档
-- [开发记录](docs/changelog.md)
-- [开发计划](docs/roadmap.md)
-- [量化知识笔记](docs/domain-notes.md)
-- [Git 工作流](docs/git-workflow.md)
-
-## 当前项目结构(已实现)
-```
-src/
-├── data/
-│   ├── data.py        # 数据采集 + 缓存逻辑
-│   ├── storage.py     # SQLite 存储层
-│   └── cache/         # 本地数据库（已 gitignore）
-├── signals/           # 信号处理因子包
-│   ├── spectrum.py    # 频域高频占比因子(FFT)
-│   ├── energy.py      # 时域能量比因子
-│   ├── autocorr.py    # 自相关因子(预警主力)
-│   ├── breadth.py     # 市场宽度实验因子(低位信号已验证失败)
-│   ├── traditional.py # 传统动量因子(弱预警候选)
-│   └── evaluate.py    # 预警有效性评估 + 基准对比
-├── strategy.py        # 策略信号
-├── backtest.py        # 回测计算
-├── plot.py            # 可视化
-└── main.py            # 编排入口
-docs/
-├── changelog.md            # 开发记录
-├── roadmap.md              # 开发计划
-├── domain-notes.md         # 量化知识笔记
-└── git-workflow.md         # git工作流 && tips
-assets/
-└── DFquant_logo.png
-.gitignore
-README.md
-requirements.txt 
 ```

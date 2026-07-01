@@ -6,8 +6,6 @@ import pandas as pd
 
 from . import storage
 
-storage.init_db()
-
 INDICES = [
     "sh000001",  # 上证指数
     "sh000300",  # 沪深300
@@ -191,7 +189,7 @@ def refresh_indices(force_refresh: bool = False) -> None:
             continue
         get_index_data(symbol, force_refresh=force_refresh)
     print("股指数据检查完成。\n")
-    
+
 def _get_last_trade_date() -> str | None:
     """获取最近交易日，优先读缓存，日历过期则更新"""
     today = datetime.date.today().strftime('%Y-%m-%d')

@@ -104,7 +104,8 @@ def evaluate_traditional_factors(close: pd.Series, factors: pd.DataFrame,
     base_rate = float((target & eligible).sum() / eligible.sum()) if eligible.sum() else np.nan
     metrics['factor'] = 'momentum_low'
     metrics['base_rate'] = base_rate
-    metrics['lift'] = metrics['hit_rate'] / base_rate if base_rate and not np.isnan(metrics['hit_rate']) else np.nan
+    hit_rate = metrics['hit_rate']
+    metrics['lift'] = hit_rate / base_rate if base_rate and not np.isnan(hit_rate) else np.nan
 
     columns = ['factor', 'n_alerts', 'n_hits', 'hit_rate', 'base_rate', 'lift']
     return pd.DataFrame([metrics])[columns]

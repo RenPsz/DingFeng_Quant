@@ -18,5 +18,5 @@ def ma_cross_signal(df: pd.DataFrame, fast: int = 5, slow: int = 20) -> pd.Serie
 
     signal = np.where(ma_fast > ma_slow, 1, 0)
     position = pd.Series(signal, index=df.index).shift(1).fillna(0)
-    
+
     return position

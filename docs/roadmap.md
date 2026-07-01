@@ -11,24 +11,24 @@
 
 ## 短期待办（按开发顺序）
 
-### 第一阶段：后端骨架 + 多因子融合预警
-- [ ] 重构为 FastAPI 后端架构（backend/ 目录）
-- [ ] 行情数据接口 + 信号因子接口
-- [ ] 规则引擎：多因子融合 → 四级预警（无/关注/警惕/危险）
-- [ ] 统一 API 返回格式
-
-### 第二阶段：前端仪表盘骨架
-- [ ] React + TypeScript 项目初始化
-- [ ] TradingView 轻量级图表接入
-- [ ] 仪表盘页面：K线 + 因子走势 + 预警指示灯
-- [ ] 前后端联调
-
-### 第三阶段：迭代填充因子
+### 第一阶段：迭代填充因子
 - [x] 传统动量因子验证（`momentum_low` 弱预警增益，保留为候选因子）
+- [ ] 在数据层接入更多种类的基础数据，增加市场数据宽度
 - [ ] 估值因子（PE/PB/股债性价比等）
 - [ ] 市场宽度因子（60 日均线以上占比低位信号验证失败，后续改试宽度快速恶化/新高新低/背离类信号）
 - [ ] 资金流向与板块轮动因子
 - [ ] 输入股票号自动识别市场
+
+### 第二阶段：后端骨架 + 多因子融合预警
+- [ ] 重构为 FastAPI 后端架构（backend/ 目录）
+- [ ] 规则引擎：多因子融合 → 四级预警（无/关注/警惕/危险）
+- [ ] 统一 API 返回格式
+
+### 第三阶段：前端仪表盘骨架
+- [ ] React + TypeScript 项目初始化
+- [ ] TradingView 轻量级图表接入
+- [ ] 仪表盘页面：K线 + 因子走势 + 预警指示灯
+- [ ] 前后端联调
 
 ## 因子验证结论（已完成）
 - **自相关转负**：捕捉趋势动能结构的衰竭，对中长期重大回撤有显著领先性（命中率提升 1.45x，优于 RSI/布林带），作为**预警主力**。
@@ -65,10 +65,12 @@
 ```
 src/
 ├── data/
+│   ├── __init__.py    # 包对外接口声明(__all__)
 │   ├── data.py        # 数据采集 + 缓存逻辑
-│   ├── storage.py     # SQLite 存储层
+│   ├── storage.py     # SQLite 存储层(懒加载建表)
 │   └── cache/         # 本地数据库（已 gitignore）
 ├── signals/           # 信号处理因子包
+│   ├── __init__.py    # 包对外接口声明(__all__)
 │   ├── spectrum.py    # 频域高频占比因子(FFT)
 │   ├── energy.py      # 时域能量比因子
 │   ├── autocorr.py    # 自相关因子(预警主力)
@@ -78,7 +80,7 @@ src/
 ├── strategy.py        # 策略信号
 ├── backtest.py        # 回测计算
 ├── plot.py            # 可视化
-└── main.py            # 编排入口
+└── main.py            # 编排入口(main() + __main__ 保护)
 docs/
 ├── changelog.md            # 开发记录
 ├── roadmap.md              # 开发计划
@@ -88,10 +90,13 @@ assets/
 └── DFquant_logo.png
 .gitignore
 README.md
-requirements.txt
+requirements.txt          # 运行依赖(精确版本锁定)
+requirements-dev.txt      # 开发依赖(当前仅 ruff，lint/format 工具)
+pyproject.toml            # ruff 配置
 ```
 
 ### 目标前后端整体架构
+```
 project/
 ├── backend/
 │   ├── main.py

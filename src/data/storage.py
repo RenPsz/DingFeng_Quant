@@ -1,6 +1,7 @@
 """存储层：SQLite 本地缓存，负责行情数据的落库与读取"""
 import sqlite3
 from pathlib import Path
+
 import pandas as pd
 
 DB_PATH = Path(__file__).parent / "cache" / "market.db"
@@ -8,30 +9,27 @@ OHLCV = ['open', 'close', 'high', 'low', 'volume']
 
 
 def _connect() -> sqlite3.Connection:
+    """建立数据库连接，并确保缓存表已就位（懒加载，重复调用安全）。"""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    return sqlite3.connect(DB_PATH)
-
-
-def init_db() -> None:
-    """初始化本地缓存表，重复调用安全。"""
-    with _connect() as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS daily (
-                symbol TEXT NOT NULL,
-                date   TEXT NOT NULL,
-                open   REAL,
-                close  REAL,
-                high   REAL,
-                low    REAL,
-                volume REAL,
-                PRIMARY KEY (symbol, date)
-            )
-        """)
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS trade_calendar (
-                date TEXT PRIMARY KEY
-            )
-        """)
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS daily (
+            symbol TEXT NOT NULL,
+            date   TEXT NOT NULL,
+            open   REAL,
+            close  REAL,
+            high   REAL,
+            low    REAL,
+            volume REAL,
+            PRIMARY KEY (symbol, date)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS trade_calendar (
+            date TEXT PRIMARY KEY
+        )
+    """)
+    return conn
 
 def upsert_calendar(dates: list[str]) -> None:
     """写入交易日历"""
