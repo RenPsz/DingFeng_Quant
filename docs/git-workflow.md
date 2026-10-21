@@ -31,6 +31,12 @@ scope（选填）：影响的范围
 subject（必填）：一句简短的描述
 用一句大白话总结这次提交具体做了什么。
 
+#### 注意事项
+1. 一个提交只做一件事：代码修复和文档更新分开提交，不写 `fix&&docs` 这类混合 type。
+2. 少用 `git add .`：优先 `git add <具体文件>`，避免把 `.doc`/`.pptx`、数据库等无关文件带进提交。
+3. 提交前 `git status` 确认不在 detached HEAD（显示 `HEAD (no branch)` 时），先 `git switch main` 或切到功能分支，否则新提交容易丢失。
+4. 根目录的开题报告等 Office 文件不进仓库，移到仓库外或在 `.gitignore` 加 `*.doc`、`*.docx`、`*.pptx`。
+
 #### Such as:
 1. 初始化项目环境
 git commit -m "chore: 配置项目初始.gitignore并完成云端首推"

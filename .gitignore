@@ -17,3 +17,8 @@ src/data/cache/
 # 4. 忽略系统日志或临时文件
 *.log
 .DS_Store
+
+# 忽略开题报告等 Office 文档
+*.doc
+*.docx
+*.pptx

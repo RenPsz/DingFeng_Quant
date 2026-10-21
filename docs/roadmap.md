@@ -11,6 +11,33 @@
 
 ## 短期待办（按开发顺序）
 
+### 第零阶段：工程修复（先于新因子开发）
+
+**已知 bug：**
+- [ ] `data.py`：前复权(qfq)数据增量缓存失真——除权除息后 qfq 全序列重算，但缓存只追加新行，新旧数据复权基准不一致。改为缓存不复权价 + 复权因子，或增量时校验重叠日价格，不一致则全量刷新
+- [ ] `evaluate.py`：`future_drawdown` 在尾部窗口不足 horizon 时仍返回值，`eligible` 未剔除这约 horizon 行截断样本，与 docstring 不符。改为仅 `i + horizon < n` 时输出
+- [ ] `storage.py`：`with sqlite3.connect()` 只提交事务不关闭连接，用 `contextlib.closing` 包装
+- [ ] `data.py`：`force_refresh` 只 upsert 不删除旧行，应先 `DELETE WHERE symbol=?`；`_clean` 原地修改入参，开头加 `copy()`
+
+**测试：**
+- [ ] 引入 `pytest`，用合成数据覆盖纯函数：`future_drawdown`、各 `*_alert`、`evaluate`、`ma_cross_signal`、`run_backtest`、`calculate_metrics`
+- [ ] 数据层 mock akshare，测试增量缓存、交易日跳过、`force_refresh` 逻辑（上面两个 data bug 先写失败用例再修）
+
+**工程化：**
+- [ ] 包结构改为 `src/dfquant/`，`pyproject.toml` 补 `[project]`，`pip install -e .` + `python -m dfquant` 运行，去掉 `cd src`
+- [ ] `signals/evaluate.py` 迁出到 `research/`（详见 `architecture-suggestions.md`）
+- [ ] ruff 规则追加 `B`、`UP`、`NPY`、`PD`、`SIM`
+- [ ] GitHub Actions：push 时跑 `ruff check` + `pytest`
+- [ ] 数据层 `print` 改 `logging`；网络请求加重试/超时，批量拉取单只失败不中断整批
+
+**可复现性：**
+- [ ] 自相关 1.45x 结论补可复跑入口（如 `experiments/autocorr_hs300.py`），参数与结果输出到 `results/*.json`
+- [ ] 窗口/horizon/阈值等散落的默认参数收进统一配置 `dataclass`
+- [ ] 预警评估加事件去重（冷却期），并用 block bootstrap 给 lift 加置信区间——当前逐日预警高度自相关，`n_alerts` 是天数而非独立事件
+
+**性能（低优先级）：**
+- [ ] `autocorr.py` 改 `r.rolling(w-1).corr(r.shift(lag))`；`spectrum.py`、`future_drawdown` 用 `sliding_window_view` 向量化
+
 ### 第一阶段：迭代填充因子
 - [x] 传统动量因子验证（`momentum_low` 弱预警增益，保留为候选因子）
 - [ ] 在数据层接入更多种类的基础数据，增加市场数据宽度
