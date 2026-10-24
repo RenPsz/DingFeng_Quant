@@ -48,6 +48,7 @@ FALLBACK_STOCK_SYMBOLS = [
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
     """统一清洗：日期化、升序、去重、数值列修正"""
+    df = df.copy()
     df['date'] = pd.to_datetime(df['date'])
     df = df.sort_values('date').reset_index(drop=True)
     df = df.drop_duplicates(subset=['date'], keep='last').reset_index(drop=True)
@@ -66,6 +67,7 @@ def _cached_fetch(symbol: str, fetch_fn, force_refresh: bool = False) -> pd.Data
     """
     if force_refresh:
         df = _clean(fetch_fn(None))
+        storage.delete_daily(symbol)
         storage.upsert_daily(symbol, df)
         return df
 
@@ -165,6 +167,10 @@ def get_stock_data(symbol: str, adjust: str = "qfq",
         if last and last_trade_date and last >= last_trade_date:
             print(f"  [{symbol}] 已是最新，跳过")
             return storage.read_daily(cache_key)
+
+        # 前复权价格会在除权除息后重算历史序列，不能只追加增量行。
+        if adjust == "qfq" and last and sync_latest:
+            force_refresh = True
 
     print(f"  [{symbol}] 正在同步...")
 

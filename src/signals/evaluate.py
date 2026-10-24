@@ -27,10 +27,10 @@ def future_drawdown(close: pd.Series, horizon: int = 60) -> pd.Series:
     arr = close.to_numpy()
     out = np.full(n, np.nan)
     for i in range(n):
+        if i + horizon >= n:
+            continue
         end = min(i + horizon + 1, n)
         window = arr[i:end]
-        if len(window) < 2:
-            continue
         # 从当前日起的滚动峰值到谷底的最大回撤
         running_max = np.maximum.accumulate(window)
         dd = (window - running_max) / running_max

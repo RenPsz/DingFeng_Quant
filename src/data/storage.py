@@ -1,5 +1,6 @@
 """存储层：SQLite 本地缓存，负责行情数据的落库与读取"""
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 import pandas as pd
@@ -33,16 +34,17 @@ def _connect() -> sqlite3.Connection:
 
 def upsert_calendar(dates: list[str]) -> None:
     """写入交易日历"""
-    with _connect() as conn:
-        conn.executemany(
-            "INSERT OR REPLACE INTO trade_calendar (date) VALUES (?)",
-            [(d,) for d in dates]
-        )
+    with closing(_connect()) as conn:
+        with conn:
+            conn.executemany(
+                "INSERT OR REPLACE INTO trade_calendar (date) VALUES (?)",
+                [(d,) for d in dates]
+            )
 
 
 def get_last_trade_date(reference: str) -> str | None:
     """返回 reference 日期当天或之前最近的交易日，无数据返回 None"""
-    with _connect() as conn:
+    with closing(_connect()) as conn:
         row = conn.execute(
             "SELECT MAX(date) FROM trade_calendar WHERE date <= ?",
             (reference,)
@@ -52,7 +54,7 @@ def get_last_trade_date(reference: str) -> str | None:
 
 def get_calendar_last_date() -> str | None:
     """返回交易日历表中最新的日期"""
-    with _connect() as conn:
+    with closing(_connect()) as conn:
         row = conn.execute(
             "SELECT MAX(date) FROM trade_calendar"
         ).fetchone()
@@ -61,7 +63,7 @@ def get_calendar_last_date() -> str | None:
 
 def get_last_date(symbol: str) -> str | None:
     """返回该 symbol 缓存中的最新日期，无数据返回 None"""
-    with _connect() as conn:
+    with closing(_connect()) as conn:
         row = conn.execute(
             "SELECT MAX(date) FROM daily WHERE symbol = ?", (symbol,)
         ).fetchone()
@@ -70,7 +72,7 @@ def get_last_date(symbol: str) -> str | None:
 
 def read_daily(symbol: str) -> pd.DataFrame:
     """读取该 symbol 的全部缓存，按日期升序"""
-    with _connect() as conn:
+    with closing(_connect()) as conn:
         df = pd.read_sql_query(
             "SELECT date, open, close, high, low, volume "
             "FROM daily WHERE symbol = ? ORDER BY date",
@@ -89,10 +91,18 @@ def upsert_daily(symbol: str, df: pd.DataFrame) -> None:
     out['symbol'] = symbol
     out['date'] = pd.to_datetime(out['date']).dt.strftime('%Y-%m-%d')
     out = out[['symbol', 'date'] + OHLCV]
-    with _connect() as conn:
-        conn.executemany(
-            "INSERT OR REPLACE INTO daily "
-            "(symbol, date, open, close, high, low, volume) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            out.itertuples(index=False, name=None)
-        )
+    with closing(_connect()) as conn:
+        with conn:
+            conn.executemany(
+                "INSERT OR REPLACE INTO daily "
+                "(symbol, date, open, close, high, low, volume) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                out.itertuples(index=False, name=None)
+            )
+
+
+def delete_daily(symbol: str) -> None:
+    """删除一个 symbol 的全部行情缓存。"""
+    with closing(_connect()) as conn:
+        with conn:
+            conn.execute("DELETE FROM daily WHERE symbol = ?", (symbol,))
