@@ -4,3 +4,14 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]  # pycodestyle, pyflakes, isort
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+markers = [
+    "unit: deterministic tests for pure functions",
+    "integration: tests crossing module or persistence boundaries",
+    "e2e: offline end-to-end workflow tests",
+    "network: tests that call external market-data services",
+]

@@ -36,6 +36,7 @@
 - [开发计划](docs/roadmap.md)
 - [量化知识笔记](docs/domain-notes.md)
 - [Git 工作流](docs/git-workflow.md)
+- [测试与 CI/CD 发布策略](docs/testing-and-release-strategy.md)
 
 ## 快速开始
 
